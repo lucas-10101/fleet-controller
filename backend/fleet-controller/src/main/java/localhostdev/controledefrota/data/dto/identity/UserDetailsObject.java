@@ -12,11 +12,13 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 public class UserDetailsObject extends User {
 
-    private String realm;
-    
-    public UserDetailsObject(String username, String password, boolean enabled, boolean accountNonExpired,
+    private String tenant;
+
+    public UserDetailsObject(String tenant, String username, String password, boolean enabled,
+            boolean accountNonExpired,
             boolean credentialsNonExpired, boolean accountNonLocked,
             Collection<? extends GrantedAuthority> authorities) {
         super(username, password, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, authorities);
+        this.tenant = tenant;
     }
 }

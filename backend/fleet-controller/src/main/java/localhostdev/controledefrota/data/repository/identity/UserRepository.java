@@ -11,5 +11,5 @@ import localhostdev.controledefrota.data.entities.identity.User;
 @Repository
 public interface UserRepository extends JpaRepository<User, Integer> {
 
-    Optional<User> findByUsernameAndTenant(String username, Realm tenant);
+    Optional<User> findByUsernameAndRealm(String username, Realm realm);
 }

@@ -15,6 +15,8 @@ import localhostdev.controledefrota.data.repository.identity.UserRepository;
 @Service
 public class AuthenticationService implements UserDetailsService {
 
+    private static final ThreadLocal<String> tenantHolder = new ThreadLocal<>();
+
     @Autowired
     private UserRepository userRepository;
 
@@ -25,13 +27,15 @@ public class AuthenticationService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
         var user = this.userRepository
-                .findByUsernameAndTenant(username, realmRepository.getReferenceById(AuthenticationService.getTenant()))
+                .findByUsernameAndRealm(username, realmRepository.getReferenceById(AuthenticationService.getTenant()))
                 .orElseThrow(() -> new UsernameNotFoundException(username));
 
         var authorities = new java.util.ArrayList<GrantedAuthority>();
 
-        return new UserDetailsObject(username,
+        return new UserDetailsObject(
+                user.getRealm().getTenant(),
                 username,
+                user.getPassword(),
                 user.isActive(),
                 user.isActive(),
                 user.isActive(),
@@ -41,7 +45,8 @@ public class AuthenticationService implements UserDetailsService {
 
     public static UserDetailsObject getCurrentUser() {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication.isAuthenticated() && authentication.getPrincipal() instanceof UserDetailsObject) {
+        if (authentication != null && authentication.isAuthenticated()
+                && authentication.getPrincipal() instanceof UserDetailsObject) {
             return ((UserDetailsObject) authentication.getPrincipal());
         }
 
@@ -49,12 +54,12 @@ public class AuthenticationService implements UserDetailsService {
     }
 
     private static String getTenantFromRequest() {
-        return null;
+        return AuthenticationService.tenantHolder.get();
     }
 
     private static String getTenantFromUser() {
         var realm = AuthenticationService.getCurrentUser();
-        return realm == null ? null : realm.getRealm();
+        return realm == null ? null : realm.getTenant();
     }
 
     public static String getTenant() {
@@ -65,5 +70,9 @@ public class AuthenticationService implements UserDetailsService {
             throw new RuntimeException("Tenant is null");
         }
         return tenant;
+    }
+
+    public static void setRequestTenant(String tenantName) {
+        AuthenticationService.tenantHolder.set(tenantName);
     }
 }
