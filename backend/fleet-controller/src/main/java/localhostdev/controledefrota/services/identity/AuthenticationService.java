@@ -15,8 +15,6 @@ import localhostdev.controledefrota.data.repository.identity.UserRepository;
 @Service
 public class AuthenticationService implements UserDetailsService {
 
-    private static final ThreadLocal<String> tenantHolder = new ThreadLocal<>();
-
     @Autowired
     private UserRepository userRepository;
 
@@ -27,7 +25,8 @@ public class AuthenticationService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
         var user = this.userRepository
-                .findByUsernameAndRealm(username, realmRepository.getReferenceById(AuthenticationService.getTenant()))
+                .findByUsernameAndRealm(username,
+                        realmRepository.getReferenceById(TenantIdentifierResolver.getTenant()))
                 .orElseThrow(() -> new UsernameNotFoundException(username));
 
         var authorities = new java.util.ArrayList<GrantedAuthority>();
@@ -51,28 +50,5 @@ public class AuthenticationService implements UserDetailsService {
         }
 
         return null;
-    }
-
-    private static String getTenantFromRequest() {
-        return AuthenticationService.tenantHolder.get();
-    }
-
-    private static String getTenantFromUser() {
-        var realm = AuthenticationService.getCurrentUser();
-        return realm == null ? null : realm.getTenant();
-    }
-
-    public static String getTenant() {
-        var tenant = AuthenticationService.getTenantFromUser();
-        tenant = tenant != null ? tenant : AuthenticationService.getTenantFromRequest();
-
-        if (tenant == null) {
-            throw new RuntimeException("Tenant is null");
-        }
-        return tenant;
-    }
-
-    public static void setRequestTenant(String tenantName) {
-        AuthenticationService.tenantHolder.set(tenantName);
     }
 }

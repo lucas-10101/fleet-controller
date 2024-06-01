@@ -19,4 +19,5 @@ public class Permission {
 
     @Column(length = 32, nullable = false, unique = true)
     private String name;
+
 }

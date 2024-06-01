@@ -1,4 +1,4 @@
-package localhostdev.controledefrota.data.entities.identity;
+package localhostdev.controledefrota.data.entities.fleet;
 
 import org.hibernate.annotations.TenantId;
 
@@ -11,34 +11,24 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
+import localhostdev.controledefrota.data.entities.identity.Realm;
 import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "users", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {
-                "username", "realm_tenant"
-        }, name = "un__users__username__realm_tenant")
-})
-public class User {
-                
+@Table(name = "vehicle_models")
+public class VehicleModel {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(length = 256, nullable = false)
-    private String username;
-        
+    @Column(length = 32, nullable = false)
+    private String name;
+
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "realm_tenant", nullable = false, updatable = false)
     private Realm realm;
-
-    @Column(length = 72, nullable = false)
-    private String password;
-
-    @Column(nullable = false)
-    private boolean active;
 
     @TenantId
     public String getTenantIdentifier() {

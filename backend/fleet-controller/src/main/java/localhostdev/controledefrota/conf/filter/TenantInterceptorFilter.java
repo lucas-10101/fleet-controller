@@ -11,7 +11,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
-import localhostdev.controledefrota.services.identity.AuthenticationService;
+import localhostdev.controledefrota.services.identity.TenantIdentifierResolver;
 
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
@@ -24,12 +24,12 @@ public class TenantInterceptorFilter implements Filter {
         try {
             var subdomainParts = request.getServerName().split("\\.");
             if (subdomainParts.length < 3) {
-                AuthenticationService.setRequestTenant(null);
+                TenantIdentifierResolver.setRequestTenant(null);
             }
 
-            AuthenticationService.setRequestTenant(subdomainParts[0]);
+            TenantIdentifierResolver.setRequestTenant(subdomainParts[0]);
         } catch (Exception e) {
-            AuthenticationService.setRequestTenant(null);
+            TenantIdentifierResolver.setRequestTenant(null);
         }
         chain.doFilter(request, response);
     }
