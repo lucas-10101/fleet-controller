@@ -12,7 +12,9 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 public class UserDetailsObject extends User {
 
-    private String tenant;
+	private static final long serialVersionUID = 1L;
+	
+	private String tenant;
 
     public UserDetailsObject(String tenant, String username, String password, boolean enabled,
             boolean accountNonExpired,
